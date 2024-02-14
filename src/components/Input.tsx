@@ -9,9 +9,10 @@ export function Input({
 }: InputProps & {onChange: (text: string) => void}) {
   const [textValue, setTextValue] = useState('');
 
-  useEffect(() => {
-    onChange(textValue);
-  }, [textValue, onChange]);
+  const handleTextChange = (text: string) => {
+    setTextValue(text);
+    onChange(text);
+  };
 
   return (
     <View style={styles.input}>
@@ -21,7 +22,7 @@ export function Input({
           style={styles.text}
           placeholder={placeholder}
           value={textValue}
-          onChangeText={setTextValue}
+          onChangeText={handleTextChange}
           secureTextEntry={title === 'Password'}
         />
       </View>

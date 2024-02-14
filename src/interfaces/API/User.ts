@@ -16,7 +16,7 @@ export interface ICoach {
 
 export interface IClient {
   id: number;
-  user: IUser;
+  client: IUser;
   height: number;
   weight: number;
   //   fitnessGoal: EFitnessGoal[];
@@ -30,6 +30,8 @@ export interface IUser {
   id: number;
   email: string;
   password: string;
+  name: string;
+  surname: string;
   userType: EUserType;
   coach: ICoach;
   client: IClient;
@@ -43,4 +45,9 @@ export interface IUser {
 export interface LoginDto {
   email: string;
   password: string;
+}
+
+export interface IHttpException {
+  message: string;
+  status: number;
 }

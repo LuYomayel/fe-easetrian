@@ -3,19 +3,21 @@ import {StyleSheet, Text, View} from 'react-native';
 // import {TopBarNav} from '../components/TopBarNav';
 import {Header} from '../components/Header';
 import {Input} from '../components/Input';
-
+import {useAuth} from '../config/AuthContext';
 import {PairButton} from '../components/PairButton';
 import {SafeAreaView} from 'react-native';
 import {Button} from '../components/Button';
-import {IUser} from '../interfaces/API/User';
+import {IUser, IHttpException} from '../interfaces/API/User';
 
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '../../App';
 
+import {apiUrl} from '../config/global';
 export function LogIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const {login} = useAuth();
 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
@@ -29,26 +31,25 @@ export function LogIn() {
     // Tu lógica aquí
   };
 
-  const [loginSuccess, setLoginSuccess] = useState(false); // Add state variable for login success
+  const [loginSuccess, setLoginSuccess] = useState(true); // Add state variable for login success
+  const [loginError, setLoginError] = useState(false); // Add state variable for login error
 
   const handlePrimaryPress = async () => {
-    console.log(primaryButtonText);
-
     const user = await fetchUser();
+
     if (user) {
-      console.log('User logged in:', user);
-      setLoginSuccess(true); // Set login success state to true
-      setTimeout(() => setLoginSuccess(false), 5000); // Hide success message after 5 seconds
+      login(user); // Aquí guardamos el usuario en el contexto
       // Navigate to the home screen or perform any other action
+      navigation.navigate('CoachHome');
     } else {
-      console.log('Invalid email or password');
+      setLoginError(true); // Set login success state to false
+      setTimeout(() => setLoginError(false), 5000); // Hide error message after 5 seconds
       // Display an error message or perform any other action
     }
   };
   async function fetchUser(): Promise<IUser | null> {
     try {
-      const response = await fetch('http://192.168.0.113:3100/users/login', {
-        // Fix URL
+      const response = await fetch(`${apiUrl}/users/login`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -56,18 +57,20 @@ export function LogIn() {
         },
         body: JSON.stringify({email, password}),
       });
-      const data = await response.json();
-      console.log('apiresult :', data);
-      if (data) {
-        navigation.navigate('CoachHome');
-        console.log('data :', data);
-        return data; // Assuming the API returns an array of users and we only need the first one
+      if (response.ok) {
+        // Si el código de estado HTTP indica éxito (200-299)
+        const data: IUser = await response.json();
+
+        return data; // Devuelve el usuario
       } else {
-        return null;
+        // Maneja los casos de error, como 404 o 401, leyendo el cuerpo de la respuesta para obtener el mensaje de error
+        const errorData = await response.json(); // O asume una estructura para errores y ajusta según tu API
+
+        throw new Error(errorData.message); // Lanza un error con el mensaje de error de la API
       }
     } catch (error) {
-      console.error('Aca muestro el error', error);
-      return null;
+      console.error(error);
+      return null; // Indica que hubo un fallo al obtener el usuario
     }
   }
 
@@ -107,9 +110,6 @@ export function LogIn() {
             onPress={handleForgotPasswordPress}
             type="primary"
           />
-          {loginSuccess && ( // Conditionally render success message
-            <Text style={styles.successText}>Login successful!</Text>
-          )}
         </View>
         {/* <RNButton
           title="Go to User Registration"
@@ -153,6 +153,11 @@ const styles = StyleSheet.create({
   },
   successText: {
     color: 'green',
+    alignSelf: 'center',
+    marginTop: 10,
+  },
+  errorText: {
+    color: 'red',
     alignSelf: 'center',
     marginTop: 10,
   },
