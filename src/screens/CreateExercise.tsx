@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {View, Button, ScrollView, StyleSheet, Alert} from 'react-native';
+import {View, Button, StyleSheet, Alert} from 'react-native';
 import {Input} from '../components/Input'; // Asegúrate de que la ruta sea correcta
 import {TopBarNav} from '../components/TopBarNav';
 import {useTranslation} from 'react-i18next';
@@ -89,7 +89,7 @@ const CreateExerciseScreen = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0} // Ajusta según sea necesario
       >
-        {/* <ScrollView style={styles.container}> */}
+        {/* <View style={styles.container}> */}
         <View style={styles.innerContainer}>
           <Input
             title="Name"
@@ -128,7 +128,7 @@ const CreateExerciseScreen = () => {
             <Button title="Submit" onPress={handleSubmit} />
           </View>
         </View>
-        {/* </ScrollView> */}
+        {/* </View> */}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

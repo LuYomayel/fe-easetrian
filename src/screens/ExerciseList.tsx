@@ -7,10 +7,12 @@ import {apiUrl} from '../config/global';
 import {useRoute} from '@react-navigation/native';
 import {useNavigationHelper} from '../utils/navigateTo';
 
-import {Exercise} from '../interfaces/API/Exercise';
+import {IExercise, IExerciseInstance} from '../interfaces/API/Exercise';
 const ExerciseList = () => {
-  const [exercises, setExercises] = useState<Exercise[]>([]);
-  const [selectedExercises, setSelectedExercises] = useState([]);
+  const [exercises, setExercises] = useState<IExercise[]>([]);
+  const [selectedExercises, setSelectedExercises] = useState<IExerciseInstance>(
+    [],
+  );
   const {navigateToWithParams} = useNavigationHelper();
   const route = useRoute();
   useEffect(() => {
@@ -43,11 +45,13 @@ const ExerciseList = () => {
     // Si vienes de ExerciseDetailsForm con un ejercicio actualizado
     if (route.params?.updatedExercise) {
       const updatedExercise = route.params.updatedExercise;
+      console.log('Updated exercise:', updatedExercise);
       // Aquí debes actualizar tu estado con el ejercicio actualizado
       // Esto podría ser agregarlo si no existe, o actualizarlo si ya está en la lista
       const index = selectedExercises.findIndex(
-        e => e.id === updatedExercise.id,
+        e => e.id === updatedExercise.exercise.id,
       );
+      console.log('Index:', index);
       if (index >= 0) {
         // Ejercicio ya existe, actualízalo
         const newSelectedExercises = [...selectedExercises];
@@ -55,6 +59,7 @@ const ExerciseList = () => {
         setSelectedExercises(newSelectedExercises);
       } else {
         // Ejercicio no existe, agrégalo
+        console.log('Exercise not found', updatedExercise);
         setSelectedExercises([...selectedExercises, updatedExercise]);
       }
     }
@@ -62,7 +67,7 @@ const ExerciseList = () => {
 
   const {t} = useTranslation();
 
-  const handleToggleExercise = (exercise: Exercise) => {
+  const handleToggleExercise = (exercise: IExercise) => {
     navigateToWithParams('ExerciseDetailsForm', {exercise});
     // setSelectedExercises(prevSelectedExercises => {
     //   const index = prevSelectedExercises.findIndex(e => e.id === exercise.id);
@@ -78,7 +83,7 @@ const ExerciseList = () => {
     // });
   };
 
-  const handleDeselect = (exercise: Exercise) => {
+  const handleDeselect = (exercise: IExercise) => {
     setSelectedExercises(prevSelectedExercises => {
       return prevSelectedExercises.filter(e => e.id !== exercise.id);
     });
@@ -95,8 +100,10 @@ const ExerciseList = () => {
       <FlatList
         data={exercises}
         renderItem={({item}) => {
+          console.log('Item:', item);
           const isSelected =
-            selectedExercises.find(e => e.id === item.id) !== undefined;
+            selectedExercises.find(e => e.exercise.id === item.id) !==
+            undefined;
           return (
             <View style={styles.itemContainer}>
               <Text style={styles.exerciseName}>{item.name}</Text>

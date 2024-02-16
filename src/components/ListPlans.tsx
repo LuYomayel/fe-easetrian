@@ -1,45 +1,45 @@
-import React from 'react';
-import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
-import {IClient} from '../interfaces/API/User';
+import React, {useEffect} from 'react';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+
 import {useNavigationHelper} from '../utils/navigateTo';
 import {RootStackParamListIds} from '../../App';
 import Icon from 'react-native-vector-icons/FontAwesome'; // Asegúrate de importar Icon correctamente
+import {IWorkout} from '../interfaces/API/Workout';
+import {useRoute} from '@react-navigation/native';
 
-interface ListProps {
-  students: IClient[];
+interface ListPlanProps {
+  workouts: IWorkout[];
+  clientId: number;
 }
-
-export const List: React.FC<ListProps> = ({students}) => {
+export const ListPlan: React.FC<ListPlanProps> = ({workouts, clientId}) => {
   const {navigateToWithParams} = useNavigationHelper();
-  const redirect = (client: IClient | null) => () => {
-    if (client !== null) {
-      // console.log('client :', client);
-      navigateToWithParams('ClientPlanList' as keyof RootStackParamListIds, {
-        id: client.id,
-      });
-      // navigateToWithParams('PlanList' as keyof RootStackParamListIds, {
-      //   id: client.id,
-      // });
+
+  const redirect = (workout: IWorkout | null) => () => {
+    console.log('clientId :', clientId, workout);
+    // return;
+    if (workout !== null) {
+      navigateToWithParams(
+        'CreateTrainingPlan' as keyof RootStackParamListIds,
+        {existingPlan: workout, clientId: clientId},
+      );
     }
   };
 
   return (
     <View style={styles.list}>
-      {students.map(student => (
-        <TouchableOpacity
-          key={student.id}
-          onPress={redirect(student.client || null)}>
+      {workouts.map(workout => (
+        <TouchableOpacity key={workout.id} onPress={redirect(workout || null)}>
           <View style={styles.item}>
             <View style={styles.frame}>
               <Icon name="user" size={20} color="#4F4F4F" />
             </View>
             <View style={styles.div}>
               <Text style={styles.title}>
-                {student.client ? student.client.name : 'N/A'}
+                {workout.planName ? workout.planName : 'N/A'}
               </Text>
-              <Text style={styles.subtitle}>
+              {/* <Text style={styles.subtitle}>
                 {student.client ? student.client.surname : 'N/A'}
-              </Text>
+              </Text> */}
             </View>
             <Icon name="search" size={20} color="#4F4F4F" />
           </View>

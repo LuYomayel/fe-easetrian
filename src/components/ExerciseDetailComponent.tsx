@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   View,
   Text,
@@ -15,8 +15,11 @@ const ExerciseDetailComponent = ({
   onToggle,
   movingUp,
   movingDown,
+  editing,
 }) => {
   const renderDetail = (value, unit, iconName) => {
+    // console.log('value :', value);
+    // return null;
     if (!value) {
       return null;
     }
@@ -27,44 +30,54 @@ const ExerciseDetailComponent = ({
       </View>
     );
   };
-  // <PanGestureHandler onGestureEvent={gestureHandler}>
-  // <GestureDetector gesture={onGestureEvent}>
-  //   <Animated.View style={[styles.itemContainer, animatedStyle]}>
-  if (!exercise) {
+  // useEffect(() => {
+  //   console.log('exercise :', exercise);
+  // }, [exercise]);
+
+  if (!exercise || !exercise.exercise) {
+    console.log('exercise :', exercise);
     console.error('ExerciseDetailComponent se llamó sin un ejercicio válido');
     return null; // O un placeholder hasta que el ejercicio esté disponible
   }
   return (
     <View style={[styles.itemContainer]}>
       <View style={styles.headerRow}>
-        <Text style={styles.exerciseName}>{exercise.name}</Text>
-        <TouchableWithoutFeedback
-          onPress={() => movingDown(exercise)}
-          style={styles.actionButton}>
-          <Icon name="arrow-downward" size={25} color="black" />
-        </TouchableWithoutFeedback>
-        <TouchableWithoutFeedback
-          onPress={() => movingUp(exercise)}
-          style={styles.actionButton}>
-          <Icon name="arrow-upward" size={25} color="black" />
-        </TouchableWithoutFeedback>
-        <TouchableWithoutFeedback
-          onPress={() => onToggle(exercise)}
-          style={styles.actionButton}>
-          <Icon name={isSelected ? 'remove' : 'add'} size={25} color="black" />
-        </TouchableWithoutFeedback>
+        <Text style={styles.exerciseName}>{exercise.exercise.name}</Text>
+        {!editing ? null : (
+          <>
+            <TouchableWithoutFeedback
+              onPress={() => movingDown(exercise)}
+              style={styles.actionButton}>
+              <Icon name="arrow-downward" size={25} color="black" />
+            </TouchableWithoutFeedback>
+            <TouchableWithoutFeedback
+              onPress={() => movingUp(exercise)}
+              style={styles.actionButton}>
+              <Icon name="arrow-upward" size={25} color="black" />
+            </TouchableWithoutFeedback>
+            <TouchableWithoutFeedback
+              onPress={() => onToggle(exercise)}
+              style={styles.actionButton}>
+              <Icon
+                name={isSelected ? 'remove' : 'add'}
+                size={25}
+                color="black"
+              />
+            </TouchableWithoutFeedback>
+          </>
+        )}
       </View>
       <View style={styles.detailsContainer}>
         {/* Renderiza los detalles aquí */}
-        {renderDetail(exercise.details.repetitions, 'reps', 'repeat')}
-        {renderDetail(exercise.details.sets, 'sets', 'layers')}
-        {renderDetail(exercise.details.weight, 'kg', 'fitness-center')}
-        {renderDetail(exercise.details.time, 's', 'timer')}
-        {renderDetail(exercise.details.restInterval, 's', 'hourglass-bottom')}
-        {renderDetail(exercise.details.tempo, '', 'speed')}
-        {renderDetail(exercise.details.notes, '', 'note')}
-        {renderDetail(exercise.details.difficulty, '', 'star')}
-        {renderDetail(exercise.details.duration, 's', 'timer')}
+        {renderDetail(exercise.repetitions, 'reps', 'repeat')}
+        {renderDetail(exercise.sets, 'sets', 'layers')}
+        {renderDetail(exercise.weight, 'kg', 'fitness-center')}
+        {renderDetail(exercise.time, 's', 'timer')}
+        {renderDetail(exercise.restInterval, 's', 'hourglass-bottom')}
+        {renderDetail(exercise.tempo, '', 'speed')}
+        {renderDetail(exercise.notes, '', 'note')}
+        {renderDetail(exercise.difficulty, '', 'star')}
+        {renderDetail(exercise.duration, 's', 'timer')}
         {/* Agrega los demás detalles como se requiera */}
       </View>
     </View>

@@ -1,8 +1,7 @@
 import React, {useEffect} from 'react';
-import {Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {Text, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {TopBarNav} from '../components/TopBarNav';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {ScrollView} from 'react-native-gesture-handler';
 
 import {useNavigationHelper} from '../utils/navigateTo';
 import {RootStackParamList} from '../../App';
@@ -17,12 +16,12 @@ const CoachHome = () => {
   };
 
   useEffect(() => {
-    console.log('user :', user);
+    // console.log('user :', user);
   }, [user]);
   return (
     <SafeAreaView style={styles.safeArea}>
       <TopBarNav pageName="home" hideBackButton={true} />
-      <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.container}>
         {/* Acceso directo a la gestión de estudiantes */}
         <TouchableOpacity
           style={styles.card}
@@ -50,7 +49,7 @@ const CoachHome = () => {
           onPress={redirect('ExerciseLibrary')}>
           <Text style={styles.cardText}>{t('exerciseLibrary')}</Text>
         </TouchableOpacity>
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 };

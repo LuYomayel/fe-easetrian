@@ -1,30 +1,30 @@
 import React, {useEffect, useState} from 'react';
-import {View, TextInput} from 'react-native';
+import {View} from 'react-native';
 import {Button} from '../components/Button';
 import {useRoute} from '@react-navigation/native'; // Importa useRoute
-import {Exercise} from '../interfaces/API/Exercise';
+import {IExercise} from '../interfaces/API/Exercise';
 import {TopBarNav} from '../components/TopBarNav';
 import {useTranslation} from 'react-i18next';
 import {Input} from '../components/Input';
-import {ExerciseDetails} from '../interfaces/API/Exercise';
-import {ScrollView} from 'react-native-gesture-handler';
+import {IExerciseDetails} from '../interfaces/API/Exercise';
+
 import {useNavigationHelper} from '../utils/navigateTo';
 const ExerciseDetailsForm = () => {
-  const [exercise, setExercise] = useState<Exercise>({
+  const [exercise, setExercise] = useState<IExercise>({
     id: 0,
     name: '',
   }); // Aquí deberías inicializar el estado con los detalles del ejercicio seleccionado
-  const [details, setDetails] = useState<ExerciseDetails>({
-    repetitions: '',
-    sets: '',
-    weight: '',
-    time: '',
-    restInterval: '',
-    tempo: '',
-    notes: '',
-    difficulty: '',
-    duration: '',
-    distance: '',
+  const [details, setDetails] = useState<IExerciseDetails>({
+    repetitions: undefined,
+    sets: undefined,
+    weight: undefined,
+    time: undefined,
+    restInterval: undefined,
+    tempo: undefined,
+    notes: undefined,
+    difficulty: undefined,
+    duration: undefined,
+    distance: undefined,
   });
 
   const {navigateToWithParams} = useNavigationHelper();
@@ -41,15 +41,27 @@ const ExerciseDetailsForm = () => {
     }
   }, [route.params]);
 
-  const handleChange = (name, value) => {
-    setDetails(prevDetails => ({...prevDetails, [name]: value}));
+  const handleChange = (name: string, value: string) => {
+    let newValue: string | number = value;
+    if (
+      name === 'repetitions' ||
+      name === 'sets' ||
+      name === 'weight' ||
+      name === 'time' ||
+      name === 'restInterval' ||
+      name === 'duration' ||
+      name === 'distance'
+    ) {
+      newValue = parseInt(value, 10);
+    }
+    setDetails(prevDetails => ({...prevDetails, [name]: newValue}));
   };
 
   // En handleSubmit de ExerciseDetailsForm
   const handleSubmit = () => {
     const updatedExercise = {
-      ...exercise,
-      details: {...details},
+      exercise: exercise,
+      ...details,
     };
 
     // Asumiendo que navigateToWithParams puede manejar estos parámetros correctamente
@@ -61,7 +73,7 @@ const ExerciseDetailsForm = () => {
   return (
     <View>
       <TopBarNav pageName={t('exerciseDetails')} />
-      <ScrollView style={{padding: 12}}>
+      <View style={{padding: 12}}>
         {/* Inputs para cada detalle, por ejemplo: */}
         <Input
           title={t('repetitions')}
@@ -115,7 +127,7 @@ const ExerciseDetailsForm = () => {
         />
 
         <Button text={t('submit')} onPress={handleSubmit} type="primary" />
-      </ScrollView>
+      </View>
     </View>
   );
 };

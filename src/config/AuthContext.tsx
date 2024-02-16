@@ -4,6 +4,7 @@ interface AuthContextData {
   user: any;
   login: (user: any) => void;
   logout: () => void;
+  getUser: () => any;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -23,8 +24,12 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({
     // Aquí también podrías eliminar el usuario del almacenamiento persistente
   };
 
+  const getUser = () => {
+    return user;
+  };
+
   return (
-    <AuthContext.Provider value={{user, login, logout}}>
+    <AuthContext.Provider value={{user, login, logout, getUser}}>
       {children}
     </AuthContext.Provider>
   );

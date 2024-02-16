@@ -15,9 +15,11 @@ import NewRoutine from './src/screens/CreateTrainingPlan';
 import CreateExerciseScreen from './src/screens/CreateExercise';
 import CreateTrainingPlan from './src/screens/CreateTrainingPlan';
 import ExerciseList from './src/screens/ExerciseList';
-import {Exercise} from './src/interfaces/API/Exercise';
+import {IExercise} from './src/interfaces/API/Exercise';
 import ExerciseDetailsForm from './src/screens/ExerciseDetailForm';
-
+import PlanList from './src/screens/PlanList';
+import {IWorkout} from './src/interfaces/API/Workout';
+import ClientPlanList from './src/screens/ClientPlanList';
 const Stack = createStackNavigator();
 export type RootStackParamList = {
   UserRegistration: undefined;
@@ -26,11 +28,16 @@ export type RootStackParamList = {
   CoachHome: undefined;
   ClientsManagment: undefined;
   CreateExercise: undefined;
-  CreateTrainingPlan: {selectedExercises: Exercise[]} | undefined;
-  ExerciseList:
-    | {updatedExercise: Exercise; exerciseList?: Exercise[]}
+  CreateTrainingPlan:
+    | {selectedExercises: IExercise[]}
+    | {existingPlan: IWorkout; clientId: number}
     | undefined;
-  ExerciseDetailsForm: {exercise: Exercise};
+  ExerciseList:
+    | {updatedExercise: IExercise; exerciseList?: IExercise[]}
+    | undefined;
+  ExerciseDetailsForm: {exercise: IExercise};
+  PlanList: {id: number};
+  ClientPlanList: {id: number};
   // ... other screen names
 };
 
@@ -65,10 +72,12 @@ function App(): JSX.Element {
             component={CreateTrainingPlan}
           />
           <Stack.Screen name="ExerciseList" component={ExerciseList} />
+          <Stack.Screen name="PlanList" component={PlanList} />
           <Stack.Screen
             name="ExerciseDetailsForm"
             component={ExerciseDetailsForm}
           />
+          <Stack.Screen name="ClientPlanList" component={ClientPlanList} />
         </Stack.Navigator>
       </NavigationContainer>
     </AuthProvider>
