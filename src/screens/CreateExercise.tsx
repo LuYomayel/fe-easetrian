@@ -4,9 +4,11 @@ import {Input} from '../components/Input'; // Asegúrate de que la ruta sea corr
 import {TopBarNav} from '../components/TopBarNav';
 import {useTranslation} from 'react-i18next';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {apiUrl} from '../config/global';
+
 import MultiSelect from '../components/MultiSelect'; // Asegúrate de que la ruta sea correcta
 import {KeyboardAvoidingView} from 'react-native';
+import {fetchBodyParts} from '../api/workout'; // Asegúrate de que la ruta sea correcta
+import {fetchNewExercise} from '../api/workout';
 const CreateExerciseScreen = () => {
   const [exerciseDetails, setExerciseDetails] = React.useState({
     name: '',
@@ -27,21 +29,16 @@ const CreateExerciseScreen = () => {
     }));
   };
   useEffect(() => {
-    const fetchBodyParts = async () => {
-      try {
-        const response = await fetch(`${apiUrl}/exercise/body-area`);
-        const data = await response.json();
-        console.log('data :', data);
-        const formattedData = data.map(part => ({
-          item: part.name, // Asume que SelectBox espera una propiedad 'item'
-          id: part.id.toString(), // Asegúrate de que 'id' sea una cadena
-        }));
-        setBodyParts(formattedData);
-      } catch (error) {
-        console.error('Error fetching body parts:', error);
-      }
-    };
-    fetchBodyParts();
+    async function fetch() {
+      const data = await fetchBodyParts();
+      const formattedData = data.map(part => ({
+        item: part.name, // Asume que SelectBox espera una propiedad 'item'
+        id: part.id.toString(), // Asegúrate de que 'id' sea una cadena
+      }));
+      setBodyParts(formattedData);
+    }
+    fetch();
+
     console.log('bodyParts 123:', bodyParts);
   }, []);
 
@@ -62,18 +59,10 @@ const CreateExerciseScreen = () => {
   const handleSubmit = async () => {
     // Aquí implementarías la lógica para enviar los datos al backend
     try {
-      console.log('exerciseDetails :', exerciseDetails);
+      // Aquí enviarías los datos al backend
+      const body = JSON.stringify(exerciseDetails);
+      await fetchNewExercise(body);
 
-      const response = await fetch(`${apiUrl}/exercise`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(exerciseDetails),
-      });
-
-      const data = await response.json();
-      console.log('data :', data);
       Alert.alert('Exercise created successfully');
     } catch (error) {
       console.error('Error creating exercise:', error);

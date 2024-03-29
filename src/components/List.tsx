@@ -3,7 +3,7 @@ import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import {IClient} from '../interfaces/API/User';
 import {useNavigationHelper} from '../utils/navigateTo';
 import {RootStackParamListIds} from '../../App';
-import Icon from 'react-native-vector-icons/FontAwesome'; // Asegúrate de importar Icon correctamente
+import Icon from 'react-native-vector-icons/FontAwesome5'; // Asegúrate de importar Icon correctamente
 
 interface ListProps {
   students: IClient[];
@@ -31,7 +31,7 @@ export const List: React.FC<ListProps> = ({students}) => {
           onPress={redirect(student.client || null)}>
           <View style={styles.item}>
             <View style={styles.frame}>
-              <Icon name="user" size={20} color="#4F4F4F" />
+              <Icon name="user" size={20} color="#4F4F4F" solid />
             </View>
             <View style={styles.div}>
               <Text style={styles.title}>
@@ -41,7 +41,7 @@ export const List: React.FC<ListProps> = ({students}) => {
                 {student.client ? student.client.surname : 'N/A'}
               </Text>
             </View>
-            <Icon name="search" size={20} color="#4F4F4F" />
+            <Icon name="search" size={20} color="#4F4F4F" solid />
           </View>
         </TouchableOpacity>
       ))}

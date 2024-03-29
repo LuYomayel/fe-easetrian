@@ -13,6 +13,8 @@ import {PairButton} from '../components/PairButton';
 import {apiUrl} from '../config/global';
 import {AssignWorkoutDto, IWorkout} from '../interfaces/API/Workout';
 import {useAuth} from '../config/AuthContext';
+import {fetchNewPlan} from '../api/workout';
+
 const CreateTrainingPlan = () => {
   const [planDetails, setPlanDetails] = useState<IWorkout[]>([]);
   const [loading, setLoading] = useState(false);
@@ -24,6 +26,7 @@ const CreateTrainingPlan = () => {
   const {t} = useTranslation();
   const [clientId, setClient] = useState(null);
   const {navigateTo, navigateToWithParams} = useNavigationHelper();
+  const {user} = useAuth();
   const redirect = (page: string) => () => {
     // console.log('Redirecting :', planDetails);
     // Just put every exercise in a single array
@@ -408,29 +411,30 @@ const CreateTrainingPlan = () => {
     }
   };
 
+  async function fetchData(body: any) {
+    await fetchNewPlan(body);
+  }
+
   const handleSavePlan = () => {
     // Lógica para guardar el plan de entrenamiento
     console.log('Plan details:', JSON.stringify(planDetails));
 
-    const currentUser = getUser();
-
     setPlanDetails({
       ...planDetails,
       coach: {
-        id: currentUser.id,
+        id: user.id,
       }, // ID del coach
     });
+
+    const body = {
+      ...planDetails,
+      coachId: user.id,
+    };
     // Enviar planDetails a tu backend o API
     try {
-      const response = fetch(`${apiUrl}/workout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(planDetails),
-      });
-      console.log('Response:', response);
+      const parsedBody = JSON.stringify(body);
 
+      fetchData(parsedBody);
       Alert.alert('Plan guardado con éxito');
       if (editingTitle) {
         setEditing(false);

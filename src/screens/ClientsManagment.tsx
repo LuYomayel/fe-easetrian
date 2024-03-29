@@ -6,27 +6,26 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {TopBarNav} from '../components/TopBarNav';
 import {List} from '../components/List';
 import {IClient} from '../interfaces/API/User';
-import {apiUrl} from '../config/global';
 import {useAuth} from '../config/AuthContext';
+import {fetchCoachClients} from '../api/coach';
 const ClientsManagment = () => {
   const [students, setStudents] = useState<IClient[]>([]);
   const {user} = useAuth();
+
   useEffect(() => {
-    const fetchStudents = async () => {
-      const response = await fetch(`${apiUrl}/subscription/coach/${user.id}`);
-      const data = await response.json();
-      // console.log('data :', data);
-      //   const students = data.filter(
-      //     (student: IClient) => student.userType === EUserType.Client,
-      //   );
-      setStudents(data);
-    };
-    fetchStudents();
+    async function fetchData() {
+      const studentsApi = await fetchCoachClients(user.id);
+      if (studentsApi) {
+        setStudents(studentsApi);
+      }
+    }
+    fetchData();
   }, [user.id]);
+
   return (
     <SafeAreaView>
       <View>
-        <TopBarNav pageName={'clientManagment'} />
+        {/* <TopBarNav pageName={'clientManagment'} /> */}
         <View>
           <List students={students} />
         </View>

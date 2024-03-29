@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 // import {TopBarNav} from '../components/TopBarNav';
 import {Header} from '../components/Header';
@@ -7,17 +7,17 @@ import {useAuth} from '../config/AuthContext';
 import {PairButton} from '../components/PairButton';
 import {SafeAreaView} from 'react-native';
 import {Button} from '../components/Button';
-import {IUser, IHttpException} from '../interfaces/API/User';
 
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '../../App';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import {apiUrl} from '../config/global';
+import {fetchUser} from '../api/login';
 export function LogIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const {login} = useAuth();
+  const {user, login} = useAuth();
 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
@@ -31,14 +31,12 @@ export function LogIn() {
     // Tu lógica aquí
   };
 
-  const [loginSuccess, setLoginSuccess] = useState(true); // Add state variable for login success
   const [loginError, setLoginError] = useState(false); // Add state variable for login error
 
   const handlePrimaryPress = async () => {
-    const user = await fetchUser();
-
-    if (user) {
-      login(user); // Aquí guardamos el usuario en el contexto
+    const userFetched = await fetchUser(email, password);
+    if (userFetched) {
+      login(userFetched); // Aquí guardamos el usuario en el contexto
       // Navigate to the home screen or perform any other action
       navigation.navigate('CoachHome');
     } else {
@@ -47,32 +45,17 @@ export function LogIn() {
       // Display an error message or perform any other action
     }
   };
-  async function fetchUser(): Promise<IUser | null> {
-    try {
-      const response = await fetch(`${apiUrl}/users/login`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({email, password}),
-      });
-      if (response.ok) {
-        // Si el código de estado HTTP indica éxito (200-299)
-        const data: IUser = await response.json();
 
-        return data; // Devuelve el usuario
-      } else {
-        // Maneja los casos de error, como 404 o 401, leyendo el cuerpo de la respuesta para obtener el mensaje de error
-        const errorData = await response.json(); // O asume una estructura para errores y ajusta según tu API
-
-        throw new Error(errorData.message); // Lanza un error con el mensaje de error de la API
+  useEffect(() => {
+    const loadStoredUser = async () => {
+      const storedUser = await AsyncStorage.getItem('user');
+      if (storedUser) {
+        login(JSON.parse(storedUser));
+        navigation.navigate('CoachHome');
       }
-    } catch (error) {
-      console.error(error);
-      return null; // Indica que hubo un fallo al obtener el usuario
-    }
-  }
+    };
+    loadStoredUser();
+  }, []);
 
   const handleForgotPasswordPress = () => {
     console.log('Forgot my password');
@@ -111,6 +94,9 @@ export function LogIn() {
             type="primary"
           />
         </View>
+        {loginError && (
+          <Text style={styles.errorText}>Invalid email or password</Text>
+        )}
         {/* <RNButton
           title="Go to User Registration"
           onPress={() => navigation.navigate('UserRegistration')}

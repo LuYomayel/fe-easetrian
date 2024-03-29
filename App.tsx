@@ -20,6 +20,7 @@ import ExerciseDetailsForm from './src/screens/ExerciseDetailForm';
 import PlanList from './src/screens/PlanList';
 import {IWorkout} from './src/interfaces/API/Workout';
 import ClientPlanList from './src/screens/ClientPlanList';
+import Navigation from './src/navigation/Navigation';
 const Stack = createStackNavigator();
 export type RootStackParamList = {
   UserRegistration: undefined;
@@ -49,7 +50,8 @@ function App(): JSX.Element {
   return (
     <AuthProvider>
       <NavigationContainer>
-        <Stack.Navigator
+        <Navigation />
+        {/* <Stack.Navigator
           initialRouteName="LogIn"
           screenOptions={{
             headerShown: false, // Esta línea oculta la barra de navegación
@@ -78,7 +80,7 @@ function App(): JSX.Element {
             component={ExerciseDetailsForm}
           />
           <Stack.Screen name="ClientPlanList" component={ClientPlanList} />
-        </Stack.Navigator>
+        </Stack.Navigator> */}
       </NavigationContainer>
     </AuthProvider>
   );
